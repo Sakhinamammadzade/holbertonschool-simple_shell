@@ -1,5 +1,7 @@
 #include "shell.h"
-
+int is_interactive(void) {
+    return isatty(STDIN_FILENO);
+}
 int main(void)
 {
 	int status;
@@ -9,15 +11,21 @@ int main(void)
 	int i = 0;
 	char **memory;
 	pid_t child_pid;
+	int interactive = is_interactive();
 
 	while (1)
 	{
-		write(1, "#cisfun$ ", 10);
+		if (interactive)
+			write(1, "#cisfun$ ", 10);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
 			free(buffer);
 			printf("\n");
 			exit(EXIT_SUCCESS);
+		}
+		if (buffer[strlen(buffer) - 1] == '\n')
+		{
+			buffer[strlen(buffer) - 1] = '\0';
 		}
 		token = strtok(buffer, "\t\n");
 		memory = malloc(sizeof(char *) * 1024);
@@ -44,6 +52,8 @@ int main(void)
 			wait(&status);
 		i = 0;
 		free(memory);
+		if (!interactive)
+			break;
 	}
 	free(buffer);
 	return (0);
