@@ -35,7 +35,7 @@ int main(void)
 			token = strtok(NULL, "\t\n");
 			i++;
 		}
-		memory[i] = NULL
+		memory[i] = NULL;
 		child_pid = fork();
 		if (child_pid == -1)
 		{
@@ -44,7 +44,7 @@ int main(void)
 		}
 		if (child_pid == 0)
 		{
-			if (execve(memory[0], memory) == -1)
+			if (execve(memory[0], memory, NULL) == -1)
 			{
 				perror("./shell: ");
 				exit(EXIT_FAILURE);
