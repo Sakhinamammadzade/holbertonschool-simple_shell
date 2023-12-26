@@ -22,6 +22,11 @@ int main(void)
 			perror("getline");
 			break;
 		}
+		if (buffer[0] == '\n')
+		{
+			free(buffer);
+			continue;
+		}
 		token = strtok(buffer, "\t\n");
 		memory = malloc(sizeof(char *) * 1024);
 		while (token != NULL)
@@ -30,10 +35,7 @@ int main(void)
 			token = strtok(NULL, "\t\n");
 			i++;
 		}
-		memory[i] = NULL;
-		free(buffer);
-		buffer = NULL;
-		buffer_size = 0;
+		memory[i] = NULL
 		child_pid = fork();
 		if (child_pid == -1)
 		{
@@ -42,7 +44,7 @@ int main(void)
 		}
 		if (child_pid == 0)
 		{
-			if (execve(memory[0], memory, NULL) == -1)
+			if (execve(memory[0], memory) == -1)
 			{
 				perror("./shell: ");
 				exit(EXIT_FAILURE);
@@ -56,7 +58,9 @@ int main(void)
 		free(memory);
 		i = 0;
 		}
+		free(buffer);
+		buffer = NULL;
+		buffer_size = 0;
 	}
-	free(buffer);
 	return (0);
 }
