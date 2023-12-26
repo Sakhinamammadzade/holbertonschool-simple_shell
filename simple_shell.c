@@ -7,10 +7,6 @@ int main(void)
 {
 	char *buffer = NULL;
 	size_t buffer_size = 0;
-	int i = 0;
-	int j;
-	char *token;
-	char **memory;
 	int status;
 	pid_t child_pid;
 
@@ -22,20 +18,12 @@ int main(void)
 			perror("getline");
 			break;
 		}
-		if (buffer[0] == '\n')
+		buffer[strcspn(buffer, "\n")] = '\0';
+		if (buffer[0] == '\0')
 		{
 			free(buffer);
 			continue;
 		}
-		token = strtok(buffer, "\t\n");
-		memory = malloc(sizeof(char *) * 1024);
-		while (token != NULL)
-		{
-			memory[i] = strdup(token);
-			token = strtok(NULL, "\t\n");
-			i++;
-		}
-		memory[i] = NULL;
 		child_pid = fork();
 		if (child_pid == -1)
 		{
@@ -44,7 +32,7 @@ int main(void)
 		}
 		if (child_pid == 0)
 		{
-			if (execve(memory[0], memory, NULL) == -1)
+			if (execlp(buffer, buffer, NULL) == -1)
 			{
 				perror("./shell: ");
 				exit(EXIT_FAILURE);
@@ -52,15 +40,13 @@ int main(void)
 		}
 		else
 		{
-		wait(&status);
-		for (j = 0; j < i; j++)
-			free(memory[j]);
-		free(memory);
-		i = 0;
+			waitpid(child_pid, &status, 0);
+			if (WIFEXITED(status) && WEXITSTATUS(status) == 127)
+				fprintf(stderr, "%s: command not found\n", buffer);
+			free(buffer);
+			buffer = NULL;
+			buffer_size = 0;
 		}
-		free(buffer);
-		buffer = NULL;
-		buffer_size = 0;
 	}
 	return (0);
 }
