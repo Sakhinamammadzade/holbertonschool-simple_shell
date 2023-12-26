@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 /**
  * main - main function to start
  * Return: Always 0
