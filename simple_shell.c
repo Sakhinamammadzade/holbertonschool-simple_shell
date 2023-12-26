@@ -8,6 +8,7 @@ int main(void)
 	char *buffer = NULL;
 	size_t buffer_size = 0;
 	int i = 0;
+	int j;
 	char *token;
 	char **memory;
 	int status;
@@ -50,7 +51,6 @@ int main(void)
 		else
 		{
 		wait(&status);
-		int j;
 		for (j = 0; j < i; j++)
 			free(memory[j]);
 		free(memory);
