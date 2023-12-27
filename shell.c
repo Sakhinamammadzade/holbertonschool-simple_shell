@@ -9,7 +9,7 @@ int main(void)
     char **memory;
     pid_t child_pid;
     int j;
-
+	inr is_piped_input;
     memory = malloc(sizeof(char *) * 1024);
 
     while (1)
@@ -38,7 +38,7 @@ int main(void)
 
         memory[i] = NULL;
 
-        int is_piped_input = isatty(fileno(stdin)) == 0;
+        is_piped_input = isatty(fileno(stdin)) == 0;
 
         child_pid = fork();
         if (child_pid == 0)
