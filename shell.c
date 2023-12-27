@@ -58,7 +58,6 @@ int main(void)
         }
     }
 
-    // Free memory outside the loop after all iterations are done
     free(buffer);
     free(memory);
 
