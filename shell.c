@@ -20,7 +20,7 @@ int main(void)
 		
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
-			printf("\n");
+			
 			break;
 		}
 		
