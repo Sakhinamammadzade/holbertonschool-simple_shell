@@ -9,7 +9,7 @@ int main(void)
     char **memory;
     pid_t child_pid;
     int j;
-	inr is_piped_input;
+	int is_piped_input;
     memory = malloc(sizeof(char *) * 1024);
 
     while (1)
