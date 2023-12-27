@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <string.h>
-
+#include "shell.h"
 int main(void)
 {
     int status;
@@ -14,9 +8,8 @@ int main(void)
     int i = 0;
     char **memory;
     pid_t child_pid;
-	int j;
 
-    memory = malloc(sizeof(char *) * 1024); 
+    memory = malloc(sizeof(char *) * 1024);  // Move memory allocation outside the loop
 
     while (1)
     {
@@ -25,16 +18,21 @@ int main(void)
             break;
         }
 
-
+        // Reset i for each iteration
         i = 0;
 
-
+        // Tokenize with any whitespace character as delimiter
         token = strtok(buffer, " \t\n");
-		if (token == NULL)
-			continue;
+
+        // Check if there is at least one non-empty token
+        if (token == NULL)
+        {
+            continue; // Skip empty lines
+        }
+
         while (token != NULL)
         {
-            memory[i] = malloc(strlen(token) + 1);
+            memory[i] = malloc(strlen(token) + 1);  // Allocate memory for each token
             strcpy(memory[i], token);
             token = strtok(NULL, " \t\n");
             i++;
@@ -48,15 +46,15 @@ int main(void)
             if (execve(memory[0], memory, NULL) == -1)
                 perror("ERROR execve:");
 
-
+            // This block should only be reached if execve fails
             exit(EXIT_FAILURE);
         }
         else
         {
             wait(&status);
 
-
-            for (j = 0; j < i; j++)
+            // Free allocated memory in the parent process
+            for (int j = 0; j < i; j++)
             {
                 free(memory[j]);
             }
@@ -68,4 +66,3 @@ int main(void)
 
     return 0;
 }
-
