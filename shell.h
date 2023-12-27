@@ -1,9 +1,15 @@
-#ifndef MY_HEADER_H
-#define MY_HEADER_H
+#ifndef SHELL_H
+#define SHELL_H
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <unistd.h>
-#include <sys/wait.h>
 #include <string.h>
-#endif
+#include <sys/wait.h>
+
+/* Function prototypes */
+int is_interactive(void);
+int execute_command(char **args);
+
+#endif /* SHELL_H */
+
