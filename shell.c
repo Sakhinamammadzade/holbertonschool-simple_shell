@@ -18,6 +18,11 @@ int main(void)
 	while (1)
 	{
 		write(1, "#cisfun$ ", 10);
+		if (getline(&buffer, &buffer_size, stdin) == -1)
+		{
+			printf("\n");
+			break;
+		}
 		getline(&buffer, &buffer_size, stdin);
 		token = strtok(buffer, "\t\n");
 		memory = malloc(sizeof(char *) * 1024);
