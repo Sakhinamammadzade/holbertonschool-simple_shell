@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 
 /* Function prototypes */
-int  _getline(int argc, char *argv[]);
+
 int is_interactive(void);
 int execute_command(char **args);
 
