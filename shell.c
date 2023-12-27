@@ -17,7 +17,7 @@ int main(void)
 
 	while (1)
 	{
-		write(1, "#cisfun$ ", 10);
+		
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
 			printf("\n");
