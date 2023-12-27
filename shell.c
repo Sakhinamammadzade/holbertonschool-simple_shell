@@ -1,6 +1,4 @@
 #include "shell.h"
-#include <errno.h>
-
 int main(void)
 {
     int status;
@@ -40,20 +38,26 @@ int main(void)
 
         memory[i] = NULL;
 
+        int is_piped_input = isatty(fileno(stdin)) == 0;
+
         child_pid = fork();
         if (child_pid == 0)
         {
-            if (execvp(memory[0], memory) == -1)
+            if (is_piped_input)
             {
-                if (errno == ENOENT)
-                {
-                    fprintf(stderr, "./hsh: %d: %s: not found\n", getpid(), memory[0]);
-                }
-                else
+                if (execvp(memory[0], memory) == -1)
                 {
                     perror("ERROR execvp:");
+                    exit(EXIT_FAILURE);
                 }
-                exit(EXIT_FAILURE);
+            }
+            else
+            {
+                if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
+                {
+                    perror("ERROR execlp:");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
         else
@@ -66,6 +70,7 @@ int main(void)
             free(memory[j]);
         }
     }
+
     free(buffer);
     free(memory);
 
