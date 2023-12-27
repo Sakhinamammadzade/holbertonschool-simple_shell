@@ -7,17 +7,32 @@ int main(void)
 	char *token;
 	pid_t child_pid;
 	int status;
-	char **parsed_command;
+	char **parsed_command = NULL;
+	int input_is_terminal;
 
+	input_is_terminal = isatty(STDIN_FILENO);
 	while (1)
 	{
-		write(1, "#cisfun$ ", 10);
+		if (input_is_terminal)
+			write(1, "#cisfun$ ", 10);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
-		{
+		{	
 			printf("\n");
 			break;
 		}
+		if (buffer[0] == '\n')
+		{
+			free(buffer);
+			continue;
+		}
+		free(parsed_command);
 		parsed_command = malloc(sizeof(char *) * 1024);
+		if (parsed_command == NULL)
+		{
+			perror("Memory allocation error");
+            exit(EXIT_FAILURE);
+		}
+		i = 0;
 		token = strtok(buffer, "\t\n");
 		while (token)
 		{
@@ -45,6 +60,10 @@ int main(void)
 			wait(&status);
 			i = 0;
 		}
+		free(buffer);
+		free(parsed_command);
 	}
+	free(buffer);
+	free(parsed_command);
 	return (0);
 }
