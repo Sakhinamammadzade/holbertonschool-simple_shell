@@ -40,7 +40,7 @@ int main(void)
 
         memory[i] = NULL;
 
-        // Check if the command exists
+
         if (access(memory[0], X_OK) == -1)
         {
             fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
@@ -73,7 +73,7 @@ int main(void)
         }
     }
 
-    // Free memory outside the loop after all iterations are done
+
     free(buffer);
     free(memory);
 
