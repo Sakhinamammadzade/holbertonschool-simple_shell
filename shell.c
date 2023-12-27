@@ -1,6 +1,6 @@
 #include "shell.h"
 
-
+extern char **environ;
 
 int main(void)
 {
@@ -19,18 +19,14 @@ int main(void)
     while (1)
     {
         if (getline(&buffer, &buffer_size, stdin) == -1)
-        {
             break;
-        }
 
         i = 0;
 
         token = strtok(buffer, " \t\n");
 
         if (token == NULL)
-        {
             continue;
-        }
 
         while (token != NULL)
         {
@@ -42,50 +38,56 @@ int main(void)
 
         memory[i] = NULL;
 
-
         if (i > 0 && strcmp(memory[0], "exit") == 0)
         {
             for (j = 0; j < i; j++)
-            {
                 free(memory[j]);
-            }
 
             free(buffer);
             free(memory);
             exit(EXIT_SUCCESS);
         }
-
-        is_piped_input = isatty(fileno(stdin)) == 0;
-
-        child_pid = fork();
-        if (child_pid == 0)
+        else if (i > 0 && strcmp(memory[0], "env") == 0)
         {
-            if (is_piped_input)
+            char **env_ptr = environ;
+            while (*env_ptr != NULL)
             {
-                if (execvp(memory[0], memory) == -1)
-                {
-                    perror("ERROR execvp:");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else
-            {
-                if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
-                {
-                    perror("ERROR execlp:");
-                    exit(EXIT_FAILURE);
-                }
+                printf("%s\n", *env_ptr);
+                env_ptr++;
             }
         }
         else
         {
-            wait(&status);
+            is_piped_input = isatty(fileno(stdin)) == 0;
+
+            child_pid = fork();
+            if (child_pid == 0)
+            {
+                if (is_piped_input)
+                {
+                    if (execvp(memory[0], memory) == -1)
+                    {
+                        perror("ERROR execvp:");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                else
+                {
+                    if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
+                    {
+                        perror("ERROR execlp:");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+            }
+            else
+            {
+                wait(&status);
+            }
         }
 
         for (j = 0; j < i; j++)
-        {
             free(memory[j]);
-        }
     }
 
     free(buffer);
