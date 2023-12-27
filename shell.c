@@ -57,7 +57,6 @@ int main(void)
             free(memory[j]);
         }
     }
-
     free(buffer);
     free(memory);
 
