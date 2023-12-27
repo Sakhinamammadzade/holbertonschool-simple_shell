@@ -6,11 +6,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
-
-/* Function prototypes */
-
-int is_interactive(void);
-int execute_command(char **args);
-
-#endif /* SHELL_H */
+#include <sys/stat.h>
+#endif
 

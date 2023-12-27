@@ -8,7 +8,7 @@ int main(void)
     int i = 0;
     char **memory;
     pid_t child_pid;
-	int j;
+    int j;
 
     memory = malloc(sizeof(char *) * 1024);
 
@@ -19,12 +19,9 @@ int main(void)
             break;
         }
 
-
         i = 0;
 
-
         token = strtok(buffer, " \t\n");
-
 
         if (token == NULL)
         {
@@ -44,24 +41,24 @@ int main(void)
         child_pid = fork();
         if (child_pid == 0)
         {
-            if (execve(memory[0], memory, NULL) == -1)
-                perror("ERROR execve:");
-
-
-            exit(EXIT_FAILURE);
+            if (execvp(memory[0], memory) == -1)
+            {
+                perror("ERROR execvp:");
+                exit(EXIT_FAILURE);
+            }
         }
         else
         {
             wait(&status);
+        }
 
-
-            for (j = 0; j < i; j++)
-            {
-                free(memory[j]);
-            }
+        for (j = 0; j < i; j++)
+        {
+            free(memory[j]);
         }
     }
 
+    // Free memory outside the loop after all iterations are done
     free(buffer);
     free(memory);
 
