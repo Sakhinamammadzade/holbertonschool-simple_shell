@@ -36,9 +36,9 @@ int main(void)
 		child_pid = fork();
 		if (child_pid == 0)
 		{
-			if (execve(memory[0], memory) == -1)
+			if (execve(memory[0], memory, NULL) == -1)
 				perror("ERROR execvp:");
-                                exit(EXIT_FAILURE);
+                               
 		}
 		else
 			wait(&status);
