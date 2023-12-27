@@ -1,5 +1,4 @@
 #include "shell.h"
-#include <errno.h>
 
 int main(void)
 {
@@ -11,7 +10,7 @@ int main(void)
     char **memory;
     pid_t child_pid;
     int j;
-	int is_piped_input;
+    int is_piped_input;
 
     memory = malloc(sizeof(char *) * 1024);
 
@@ -40,14 +39,23 @@ int main(void)
         }
 
         memory[i] = NULL;
+		if (i > 0 && strcmp(memory[0], "exit") == 0)
+        {
+            for (j = 0; j < i; j++)
+            {
+                free(memory[j]);
+            }
 
+            free(buffer);
+            free(memory);
+            exit(EXIT_SUCCESS);
+        }
 
         is_piped_input = isatty(fileno(stdin)) == 0;
 
         child_pid = fork();
         if (child_pid == 0)
         {
-
             if (is_piped_input)
             {
                 if (execvp(memory[0], memory) == -1)
@@ -58,7 +66,6 @@ int main(void)
             }
             else
             {
-
                 if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
                 {
                     perror("ERROR execlp:");
@@ -76,7 +83,6 @@ int main(void)
             free(memory[j]);
         }
     }
-
 
     free(buffer);
     free(memory);
