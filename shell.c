@@ -1,4 +1,6 @@
 #include "shell.h"
+#include <errno.h>
+
 int main(void)
 {
     int status;
@@ -9,7 +11,7 @@ int main(void)
     char **memory;
     pid_t child_pid;
     int j;
-	int is_piped_input;
+
     memory = malloc(sizeof(char *) * 1024);
 
     while (1)
@@ -38,26 +40,26 @@ int main(void)
 
         memory[i] = NULL;
 
-        is_piped_input = isatty(fileno(stdin)) == 0;
+        // Check if the command exists
+        if (access(memory[0], X_OK) == -1)
+        {
+            fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+
+            for (j = 0; j < i; j++)
+            {
+                free(memory[j]);
+            }
+
+            continue;
+        }
 
         child_pid = fork();
         if (child_pid == 0)
         {
-            if (is_piped_input)
+            if (execvp(memory[0], memory) == -1)
             {
-                if (execvp(memory[0], memory) == -1)
-                {
-                    perror("ERROR execvp:");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else
-            {
-                if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
-                {
-                    perror("ERROR execlp:");
-                    exit(EXIT_FAILURE);
-                }
+                perror("ERROR execvp:");
+                exit(EXIT_FAILURE);
             }
         }
         else
@@ -71,6 +73,7 @@ int main(void)
         }
     }
 
+    // Free memory outside the loop after all iterations are done
     free(buffer);
     free(memory);
 
