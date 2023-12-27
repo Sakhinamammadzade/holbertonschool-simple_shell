@@ -17,6 +17,7 @@ int main(void)
 			printf("\n");
 			break;
 		}
+		parsed_command = malloc(sizeof(char *) * 1024);
 		token = strtok(buffer, "\t\n");
 		while (token)
 		{
