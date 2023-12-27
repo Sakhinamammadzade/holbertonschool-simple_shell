@@ -30,7 +30,8 @@ int main(void)
 
 
         token = strtok(buffer, " \t\n");
-
+		if (token == NULL)
+			continue;
         while (token != NULL)
         {
             memory[i] = malloc(strlen(token) + 1);
