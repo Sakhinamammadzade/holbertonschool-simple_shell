@@ -11,6 +11,7 @@ int main(void)
     char **memory;
     pid_t child_pid;
     int j;
+	int is_piped_input
 
     memory = malloc(sizeof(char *) * 1024);
 
@@ -41,25 +42,28 @@ int main(void)
         memory[i] = NULL;
 
 
-        if (access(memory[0], X_OK) == -1)
-        {
-            fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
-
-            for (j = 0; j < i; j++)
-            {
-                free(memory[j]);
-            }
-
-            continue;
-        }
+        is_piped_input = isatty(fileno(stdin)) == 0;
 
         child_pid = fork();
         if (child_pid == 0)
         {
-            if (execvp(memory[0], memory) == -1)
+
+            if (is_piped_input)
             {
-                perror("ERROR execvp:");
-                exit(EXIT_FAILURE);
+                if (execvp(memory[0], memory) == -1)
+                {
+                    perror("ERROR execvp:");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+            {
+
+                if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
+                {
+                    perror("ERROR execlp:");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
         else
