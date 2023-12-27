@@ -39,7 +39,9 @@ int main(void)
         }
 
         memory[i] = NULL;
-		if (i > 0 && strcmp(memory[0], "exit") == 0)
+
+
+        if (i > 0 && strcmp(memory[0], "exit") == 0)
         {
             for (j = 0; j < i; j++)
             {
@@ -48,7 +50,7 @@ int main(void)
 
             free(buffer);
             free(memory);
-            exit(EXIT_SUCCESS);
+            exit(status);
         }
 
         is_piped_input = isatty(fileno(stdin)) == 0;
