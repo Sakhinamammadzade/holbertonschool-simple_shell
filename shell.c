@@ -14,6 +14,7 @@ int main(void)
     int i = 0;
     char **memory;
     pid_t child_pid;
+	int j;
 
     memory = malloc(sizeof(char *) * 1024);  // Move memory allocation outside the loop
 
@@ -54,7 +55,7 @@ int main(void)
             wait(&status);
 
             // Free allocated memory in the parent process
-            for (int j = 0; j < i; j++)
+            for (j = 0; j < i; j++)
             {
                 free(memory[j]);
             }
