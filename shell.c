@@ -1,4 +1,6 @@
 #include "shell.h"
+#include <errno.h>
+
 int main(void)
 {
     int status;
@@ -43,7 +45,14 @@ int main(void)
         {
             if (execvp(memory[0], memory) == -1)
             {
-                perror("ERROR execvp:");
+                if (errno == ENOENT)
+                {
+                    fprintf(stderr, "./hsh: %d: %s: not found\n", getpid(), memory[0]);
+                }
+                else
+                {
+                    perror("ERROR execvp:");
+                }
                 exit(EXIT_FAILURE);
             }
         }
