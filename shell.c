@@ -23,7 +23,7 @@ int main(void)
 			printf("\n");
 			break;
 		}
-		getline(&buffer, &buffer_size, stdin);
+		
 		token = strtok(buffer, "\t\n");
 		memory = malloc(sizeof(char *) * 1024);
 		while (token != NULL)
@@ -36,8 +36,9 @@ int main(void)
 		child_pid = fork();
 		if (child_pid == 0)
 		{
-			if (execve(memory[0], memory, NULL) == -1)
-				perror("ERROR execve:");
+			if (execve(memory[0], memory) == -1)
+				perror("ERROR execvp:");
+                                exit(EXIT_FAILURE);
 		}
 		else
 			wait(&status);
