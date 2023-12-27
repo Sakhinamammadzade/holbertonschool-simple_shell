@@ -1,5 +1,7 @@
 #include "shell.h"
 
+
+
 int main(void)
 {
     int status;
@@ -50,7 +52,7 @@ int main(void)
 
             free(buffer);
             free(memory);
-            exit(status);
+            exit(EXIT_SUCCESS);
         }
 
         is_piped_input = isatty(fileno(stdin)) == 0;
