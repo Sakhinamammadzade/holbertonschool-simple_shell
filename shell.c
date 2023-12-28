@@ -68,7 +68,7 @@ int main(void)
                     if (execvp(memory[0], memory) == -1)
                     {
                          perror("ERROR execvp:");
-                        exit(EXIT_FAILURE);
+                        exit(2);
                     }
                 }
                 else
