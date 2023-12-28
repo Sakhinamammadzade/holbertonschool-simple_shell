@@ -1,3 +1,5 @@
+#!/bin/sh
+.TH MY_Shell 3 "December 2023" "Version 1.0" "My Shell Project Manual"
 .TH HSH 1
 .SH NAME
 hsh \- Holberton Shell	
