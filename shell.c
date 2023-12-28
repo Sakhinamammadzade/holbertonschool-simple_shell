@@ -67,8 +67,8 @@ int main(void)
                 {
                     if (execvp(memory[0], memory) == -1)
                     {
-                       fprintf(stderr, "%s: %d: %s: not found\n", PROGRAM_NAME, line_number, memory[0]);
-                        exit(127);
+                         perror("ERROR execvp:");
+                        exit(EXIT_FAILURE);
                     }
                 }
                 else
