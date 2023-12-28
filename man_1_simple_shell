@@ -5,6 +5,21 @@
 hsh \- Holberton Shell	
 .SH SYNOPSIS
 .B hsh
+.B #include <stdio.h>
+.br
+.B #include <errno.h>
+.br
+.B #include <stdlib.h>
+.br
+.B #include <unistd.h>
+.br
+.B #include<string.h>
+.br
+.B #include <sys/wait.h>
+.br
+.B #include <sys/stat.h>
+.br
+.B #include "shell.h"
 [command] [options ...]
 .SH COPYRIGHT
 hsh \- is a holberton school first trimester project
