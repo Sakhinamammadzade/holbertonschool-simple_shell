@@ -73,11 +73,12 @@ int main(void)
                 }
                 else
                 {
-                    if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
+                  if (system(buffer) == -1)
                     {
-                        perror("ERROR execlp:");
+                        perror("ERROR system:");
                         exit(EXIT_FAILURE);
                     }
+                    exit(2);
                 }
             }
             else
