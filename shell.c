@@ -40,7 +40,7 @@ int main(void) {
     size_t buffer_size = 0;
     char *token;
     char **commands;
-    int i;
+    int i, j, k;
 
     while (1) {
         if (getline(&buffer, &buffer_size, stdin) == -1)
@@ -63,10 +63,10 @@ int main(void) {
 
         commands[i] = NULL;
 
-        for (int j = 0; j < i; j++) {
+        for (j = 0; j < i; j++) {
             if (strcmp(commands[j], "exit") == 0) {
                 free(buffer);
-                for (int k = 0; k < i; k++)
+                for (k = 0; k < i; k++)
                     free(commands[k]);
                 free(commands);
                 exit(EXIT_SUCCESS);
@@ -75,7 +75,7 @@ int main(void) {
             }
         }
 
-        for (int j = 0; j < i; j++)
+        for (j = 0; j < i; j++)
             free(commands[j]);
         free(commands);
     }
