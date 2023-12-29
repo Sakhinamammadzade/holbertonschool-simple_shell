@@ -10,7 +10,7 @@ extern char **environ;
 void execute_command(char *command) {
     pid_t child_pid;
     int status;
-
+	int j;
     char *token;
     char **args;
     int i = 0;
@@ -50,7 +50,7 @@ void execute_command(char *command) {
         }
     }
 
-    for (int j = 0; j < i; j++)
+    for (j = 0; j < i; j++)
         free(args[j]);
     free(args);
 }
@@ -61,6 +61,8 @@ int main(void) {
     char *token;
     char **commands;
     int i;
+	int j;
+	int k;
 
     while (1) {
         if (getline(&buffer, &buffer_size, stdin) == -1)
@@ -83,10 +85,10 @@ int main(void) {
 
         commands[i] = NULL;
 
-        for (int j = 0; j < i; j++) {
+        for (j = 0; j < i; j++) {
             if (strcmp(commands[j], "exit") == 0) {
                 free(buffer);
-                for (int k = 0; k < i; k++)
+                for (k = 0; k < i; k++)
                     free(commands[k]);
                 free(commands);
                 exit(EXIT_SUCCESS);
@@ -95,7 +97,7 @@ int main(void) {
             }
         }
 
-        for (int j = 0; j < i; j++)
+        for (j = 0; j < i; j++)
             free(commands[j]);
         free(commands);
     }
