@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "main.h"
 
 extern char **environ;
 
@@ -60,34 +60,57 @@ int main(void)
         {
             is_piped_input = isatty(fileno(stdin)) == 0;
 
-            child_pid = fork();
-            if (child_pid == 0)
+            // Check if the command exists in PATH
+            if (access(memory[0], X_OK) == 0)
             {
-                if (is_piped_input)
+                child_pid = fork();
+                if (child_pid == 0)
                 {
-                    if (execvp(memory[0], memory) == -1)
+                    if (is_piped_input)
                     {
-                         perror("ERROR execvp:");
-                        exit(EXIT_FAILURE);
+                        // Use popen to handle pipes
+                        FILE *pipe_fp = popen(buffer, "r");
+                        if (pipe_fp == NULL)
+                        {
+                            perror("ERROR popen:");
+                            exit(EXIT_FAILURE);
+                        }
+
+                        // Read from the pipe
+                        char line[1024];
+                        while (fgets(line, sizeof(line), pipe_fp) != NULL)
+                        {
+                            printf("%s", line);
+                        }
+
+                        // Close the pipe
+                        if (pclose(pipe_fp) == -1)
+                        {
+                            perror("ERROR pclose:");
+                            exit(EXIT_FAILURE);
+                        }
+                    }
+                    else
+                    {
+                        if (execvp(memory[0], memory) == -1)
+                        {
+                            perror("ERROR execvp:");
+                            exit(EXIT_FAILURE);
+                        }
                     }
                 }
                 else
                 {
-                  if (system(buffer) == -1)
+                    wait(&status);
+                    if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
                     {
-                        perror("ERROR system:");
-                        exit(EXIT_FAILURE);
+                        fprintf(stderr, "Command failed with exit status: %d\n", WEXITSTATUS(status));
                     }
-                    exit(EXIT_FAILURE);
                 }
             }
             else
             {
-                wait(&status);
-                if(WIFEXITED(status) && WEXITSTATUS(status) != 0)
-		{
-		fprintf(stderr, "Command failed with exit status: %d\n", WEXITSTATUS(status));
-		}
+                fprintf(stderr, "Command not found: %s\n", memory[0]);
             }
         }
 
