@@ -1,4 +1,10 @@
-#include "shell.h"
+nclude <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <errno.h>
 
 extern char **environ;
 
@@ -63,19 +69,35 @@ int main(void)
             if (child_pid == 0)
             {
                 if (is_piped_input)
-                    execvp(memory[0], memory);
-                else
-                    execvp(memory[0], memory);
+                {
+                    FILE *pipe_fp = popen(buffer, "r");
+                    if (pipe_fp == NULL)
+                    {
+                        perror("popen");
+                        exit(EXIT_FAILURE);
+                    }
 
-                if (errno == ENOENT)
-                {
-                    fprintf(stderr, "%s: %s\n", memory[0], strerror(ENOENT));
+                    char line[1024];
+                    while (fgets(line, sizeof(line), pipe_fp) != NULL)
+                    {
+                        printf("%s", line);
+                    }
+
+                    pclose(pipe_fp);
                 }
                 else
                 {
-                    perror("ERROR execvp:");
+                    execvp(memory[0], memory);
+                    if (errno == ENOENT)
+                    {
+                        fprintf(stderr, "%s: %s\n", memory[0], strerror(ENOENT));
+                    }
+                    else
+                    {
+                        perror("ERROR execvp:");
+                    }
+                    exit(EXIT_FAILURE);
                 }
-                exit(EXIT_FAILURE);
             }
             else
             {
