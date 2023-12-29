@@ -67,7 +67,7 @@ int main(void)
                     if (errno == ENOENT)
                     {
                         fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
-                        exit(127); // conventionally used to indicate command not found
+                        exit(127);
                     }
                     else
                     {
