@@ -57,20 +57,28 @@ pid_t child_pid;
                     if (execvp(memory[0], memory) == -1)
                     {
                         perror("ERROR execvp:");
+			fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                         exit(EXIT_FAILURE);
                     }
                 } else
                 {
-                    if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
+                    if (execvp(memory[0], memory) == -1)
                     {
-                        perror("ERROR execlp:");
+                        perror("ERROR execvp:");
+                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                         exit(EXIT_FAILURE);
+                       
                     }
                 }
             }
             else
             {
                 wait(&status);
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+        	{
+                fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                exit(WEXITSTATUS(status));
+        	}
             }
         }
         for (j = 0; j < i; j++)
