@@ -63,6 +63,7 @@ int main(void)
         }
         else
         {
+            char line[1024];
             is_piped_input = isatty(fileno(stdin)) == 0;
             child_pid = fork();
 
@@ -77,7 +78,6 @@ int main(void)
                         exit(EXIT_FAILURE);
                     }
 
-                    char line[1024];
                     while (fgets(line, sizeof(line), pipe_fp) != NULL)
                     {
                         printf("%s", line);
