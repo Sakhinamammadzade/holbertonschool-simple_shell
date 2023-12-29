@@ -9,9 +9,10 @@ int main(void)
     char *token;
     int i = 0;
     char **memory;
-pid_t child_pid;
+    pid_t child_pid;
     int j;
     int is_piped_input;
+
     memory = malloc(sizeof(char *) * 1024);
     while (1)
     {
@@ -49,44 +50,56 @@ pid_t child_pid;
         else
         {
             is_piped_input = isatty(fileno(stdin)) == 0;
- 	    child_pid = fork();
+            child_pid = fork();
             if (child_pid == 0)
             {
                 if (is_piped_input)
                 {
                     if (execvp(memory[0], memory) == -1)
                     {
-                        perror("ERROR execvp:");
-			fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        if (errno == ENOENT)
+                        {
+                            fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        }
+                        else
+                        {
+                            perror("ERROR execvp:");
+                        }
                         exit(EXIT_FAILURE);
                     }
-                } else
+                }
+                else
                 {
                     if (execvp(memory[0], memory) == -1)
                     {
-                        perror("ERROR execvp:");
-                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        if (errno == ENOENT)
+                        {
+                            fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        }
+                        else
+                        {
+                            perror("ERROR execvp:");
+                        }
                         exit(EXIT_FAILURE);
-                       
                     }
                 }
             }
             else
             {
                 wait(&status);
-		 if (WIFEXITED(status))
-        	{
-            	if (WEXITSTATUS(status) != 0)
-            	{
-                fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
-                exit(WEXITSTATUS(status));
-            	}
-        	}
-        	else if (WIFSIGNALED(status))
-        	{
-            fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
-            exit(EXIT_FAILURE);
-        }
+                if (WIFEXITED(status))
+                {
+                    if (WEXITSTATUS(status) != 0)
+                    {
+                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        exit(WEXITSTATUS(status));
+                    }
+                }
+                else if (WIFSIGNALED(status))
+                {
+                    fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
+                    exit(EXIT_FAILURE);
+                }
             }
         }
         for (j = 0; j < i; j++)
