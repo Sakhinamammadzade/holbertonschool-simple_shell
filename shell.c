@@ -67,12 +67,13 @@ int main(void)
                     if (errno == ENOENT)
                     {
                         fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        exit(127); // conventionally used to indicate command not found
                     }
                     else
                     {
                         perror("ERROR execvp:");
+                        exit(EXIT_FAILURE);
                     }
-                    exit(EXIT_FAILURE);
                 }
             }
             else
