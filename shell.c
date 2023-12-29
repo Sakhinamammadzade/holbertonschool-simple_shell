@@ -1,13 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <errno.h>
+#include "shell.h"
 
 extern char **environ;
-
 int main(void)
 {
     int status;
@@ -16,23 +9,18 @@ int main(void)
     char *token;
     int i = 0;
     char **memory;
-    pid_t child_pid;
+pid_t child_pid;
     int j;
     int is_piped_input;
-
     memory = malloc(sizeof(char *) * 1024);
-
     while (1)
     {
         if (getline(&buffer, &buffer_size, stdin) == -1)
             break;
-
         i = 0;
         token = strtok(buffer, " \t\n");
-
         if (token == NULL)
             continue;
-
         while (token != NULL)
         {
             memory[i] = malloc(strlen(token) + 1);
@@ -40,14 +28,11 @@ int main(void)
             token = strtok(NULL, " \t\n");
             i++;
         }
-
         memory[i] = NULL;
-
         if (i > 0 && strcmp(memory[0], "exit") == 0)
         {
             for (j = 0; j < i; j++)
                 free(memory[j]);
-
             free(buffer);
             free(memory);
             exit(EXIT_SUCCESS);
@@ -63,64 +48,51 @@ int main(void)
         }
         else
         {
-            char line[1024];
             is_piped_input = isatty(fileno(stdin)) == 0;
-            child_pid = fork();
-
+ 	    child_pid = fork();
             if (child_pid == 0)
             {
                 if (is_piped_input)
                 {
-                    FILE *pipe_fp = popen(buffer, "r");
-                    if (pipe_fp == NULL)
+                    if (execvp(memory[0], memory) == -1)
                     {
-                        perror("popen");
+                        perror("ERROR execvp:");
+			fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                         exit(EXIT_FAILURE);
                     }
-
-                    while (fgets(line, sizeof(line), pipe_fp) != NULL)
-                    {
-                        printf("%s", line);
-                    }
-
-                    if (pclose(pipe_fp) != 0)
-                    {
-                        fprintf(stderr, "%s: %s\n", memory[0], strerror(errno));
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                else
+                } else
                 {
-                    execvp(memory[0], memory);
-                    fprintf(stderr, "%s: %s\n", memory[0], strerror(errno));
-                    exit(EXIT_FAILURE);
+                    if (execvp(memory[0], memory) == -1)
+                    {
+                        perror("ERROR execvp:");
+                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        exit(EXIT_FAILURE);
+                       
+                    }
                 }
             }
             else
             {
                 wait(&status);
-                if (WIFEXITED(status))
-                {
-                    if (WEXITSTATUS(status) != 0)
-                    {
-                        fprintf(stderr, "%s: %s\n", memory[0], strerror(WEXITSTATUS(status)));
-                        exit(WEXITSTATUS(status));
-                    }
-                }
-                else if (WIFSIGNALED(status))
-                {
-                    fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
-                    exit(EXIT_FAILURE);
-                }
+		 if (WIFEXITED(status))
+        	{
+            	if (WEXITSTATUS(status) != 0)
+            	{
+                fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                exit(WEXITSTATUS(status));
+            	}
+        	}
+        	else if (WIFSIGNALED(status))
+        	{
+            fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
+            exit(EXIT_FAILURE);
+        }
             }
         }
-
         for (j = 0; j < i; j++)
             free(memory[j]);
     }
-
     free(buffer);
     free(memory);
-
     return 0;
 }
