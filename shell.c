@@ -1,4 +1,8 @@
 #include "shell.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> a77538f1e3fe37d004223617229f4958d64a6871
 extern char **environ;
 int main(void)
 {
