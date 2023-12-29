@@ -49,6 +49,10 @@ pid_t child_pid;
         else
         {
             is_piped_input = isatty(fileno(stdin)) == 0;
+ 	     if (getenv("PATH") == NULL || strcmp(getenv("PATH"), "") == 0) {
+     		   fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+       		    exit(EXIT_FAILURE);
+    }
             child_pid = fork();
             if (child_pid == 0)
             {
