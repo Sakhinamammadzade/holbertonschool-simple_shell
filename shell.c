@@ -67,8 +67,14 @@ int main(void)
                 else
                     execvp(memory[0], memory);
 
-  
-                perror("ERROR execvp:");
+                if (errno == ENOENT)
+                {
+                    fprintf(stderr, "%s: %s\n", memory[0], strerror(ENOENT));
+                }
+                else
+                {
+                    perror("ERROR execvp:");
+                }
                 exit(EXIT_FAILURE);
             }
             else
@@ -76,11 +82,7 @@ int main(void)
                 wait(&status);
                 if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
                 {
-                    if (WEXITSTATUS(status) == 127) 
-                        fprintf(stderr, "%s: %s\n", memory[0], strerror(ENOENT));
-                    else
-                        fprintf(stderr, "%s: %s\n", memory[0], strerror(WEXITSTATUS(status)));
-
+                    fprintf(stderr, "%s: %s\n", memory[0], strerror(WEXITSTATUS(status)));
                     exit(WEXITSTATUS(status));
                 }
                 else if (WIFSIGNALED(status))
@@ -100,4 +102,3 @@ int main(void)
 
     return 0;
 }
-
