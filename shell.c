@@ -64,7 +64,14 @@ int main(void)
             {
                 if (is_piped_input || execvp(memory[0], memory) == -1)
                 {
-                    perror("ERROR execvp:");
+                    if (errno == ENOENT)
+                    {
+                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                    }
+                    else
+                    {
+                        perror("ERROR execvp:");
+                    }
                     exit(EXIT_FAILURE);
                 }
             }
@@ -75,7 +82,7 @@ int main(void)
                 {
                     if (WEXITSTATUS(status) != 0)
                     {
-                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        fprintf(stderr, "./hsh: 1: %s: exited with status %d\n", memory[0], WEXITSTATUS(status));
                         exit(WEXITSTATUS(status));
                     }
                 }
