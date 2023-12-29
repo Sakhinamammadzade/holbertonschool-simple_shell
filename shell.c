@@ -74,11 +74,19 @@ pid_t child_pid;
             else
             {
                 wait(&status);
-		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+		 if (WIFEXITED(status))
         	{
+            	if (WEXITSTATUS(status) != 0)
+            	{
                 fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                 exit(WEXITSTATUS(status));
+            	}
         	}
+        	else if (WIFSIGNALED(status))
+        	{
+            fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
+            exit(EXIT_FAILURE);
+        }
             }
         }
         for (j = 0; j < i; j++)
