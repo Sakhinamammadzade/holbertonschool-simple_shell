@@ -62,30 +62,21 @@ int main(void)
 
             if (child_pid == 0)
             {
-                if (is_piped_input || execvp(memory[0], memory) == -1)
-                {
-                    if (errno == ENOENT)
-                    {
-                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
-                        exit(127);
-                    }
-                    else
-                    {
-                        perror("ERROR execvp:");
-                        exit(EXIT_FAILURE);
-                    }
-                }
+                if (is_piped_input)
+                    execvp(memory[0], memory);
+                else
+                    execvp(memory[0], memory);
+
+                 perror("ERROR execvp:");
+                exit(EXIT_FAILURE);
             }
             else
             {
                 wait(&status);
-                if (WIFEXITED(status))
+                if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
                 {
-                    if (WEXITSTATUS(status) != 0)
-                    {
-                        fprintf(stderr, "./hsh: 1: %s: exited with status %d\n", memory[0], WEXITSTATUS(status));
-                        exit(WEXITSTATUS(status));
-                    }
+                    fprintf(stderr, "./hsh: 1: %s: exited with status %d\n", memory[0], WEXITSTATUS(status));
+                    exit(WEXITSTATUS(status));
                 }
                 else if (WIFSIGNALED(status))
                 {
