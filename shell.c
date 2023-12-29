@@ -1,6 +1,7 @@
 #include "shell.h"
 
 extern char **environ;
+
 int main(void)
 {
     int status;
@@ -14,14 +15,18 @@ int main(void)
     int is_piped_input;
 
     memory = malloc(sizeof(char *) * 1024);
+
     while (1)
     {
         if (getline(&buffer, &buffer_size, stdin) == -1)
             break;
+
         i = 0;
         token = strtok(buffer, " \t\n");
+
         if (token == NULL)
             continue;
+
         while (token != NULL)
         {
             memory[i] = malloc(strlen(token) + 1);
@@ -29,11 +34,14 @@ int main(void)
             token = strtok(NULL, " \t\n");
             i++;
         }
+
         memory[i] = NULL;
+
         if (i > 0 && strcmp(memory[0], "exit") == 0)
         {
             for (j = 0; j < i; j++)
                 free(memory[j]);
+
             free(buffer);
             free(memory);
             exit(EXIT_SUCCESS);
@@ -51,37 +59,13 @@ int main(void)
         {
             is_piped_input = isatty(fileno(stdin)) == 0;
             child_pid = fork();
+
             if (child_pid == 0)
             {
-                if (is_piped_input)
+                if (is_piped_input || execvp(memory[0], memory) == -1)
                 {
-                    if (execvp(memory[0], memory) == -1)
-                    {
-                        if (errno == ENOENT)
-                        {
-                            fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
-                        }
-                        else
-                        {
-                            perror("ERROR execvp:");
-                        }
-                        exit(EXIT_FAILURE);
-                    }
-                }
-                else
-                {
-                    if (execvp(memory[0], memory) == -1)
-                    {
-                        if (errno == ENOENT)
-                        {
-                            fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
-                        }
-                        else
-                        {
-                            perror("ERROR execvp:");
-                        }
-                        exit(EXIT_FAILURE);
-                    }
+                    perror("ERROR execvp:");
+                    exit(EXIT_FAILURE);
                 }
             }
             else
@@ -102,10 +86,13 @@ int main(void)
                 }
             }
         }
+
         for (j = 0; j < i; j++)
             free(memory[j]);
     }
+
     free(buffer);
     free(memory);
+
     return 0;
 }
