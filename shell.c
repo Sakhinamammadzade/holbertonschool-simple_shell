@@ -83,29 +83,29 @@ int main(void)
                         printf("%s", line);
                     }
 
-                    pclose(pipe_fp);
+                    if (pclose(pipe_fp) != 0)
+                    {
+                        fprintf(stderr, "%s: %s\n", memory[0], strerror(errno));
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 else
                 {
                     execvp(memory[0], memory);
-                    if (errno == ENOENT)
-                    {
-                        fprintf(stderr, "%s: %s\n", memory[0], strerror(ENOENT));
-                    }
-                    else
-                    {
-                        perror("ERROR execvp:");
-                    }
+                    fprintf(stderr, "%s: %s\n", memory[0], strerror(errno));
                     exit(EXIT_FAILURE);
                 }
             }
             else
             {
                 wait(&status);
-                if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+                if (WIFEXITED(status))
                 {
-                    fprintf(stderr, "%s: %s\n", memory[0], strerror(WEXITSTATUS(status)));
-                    exit(WEXITSTATUS(status));
+                    if (WEXITSTATUS(status) != 0)
+                    {
+                        fprintf(stderr, "%s: %s\n", memory[0], strerror(WEXITSTATUS(status)));
+                        exit(WEXITSTATUS(status));
+                    }
                 }
                 else if (WIFSIGNALED(status))
                 {
