@@ -68,7 +68,7 @@ int main(void)
                     if (execvp(memory[0], memory) == -1)
                     {
                          perror("ERROR execvp:");
-                        exit(2);
+                        exit(EXIT_FAILURE);
                     }
                 }
                 else
@@ -78,12 +78,16 @@ int main(void)
                         perror("ERROR system:");
                         exit(EXIT_FAILURE);
                     }
-                    exit(2);
+                    exit(EXIT_FAILURE);
                 }
             }
             else
             {
                 wait(&status);
+                if(WIFEXITED(status) && WEXITSTATUS(status) != 0)
+		{
+		fprintf(stderr, "Command failed with exit status: %d\n", WEXITSTATUS(status));
+		}
             }
         }
 
