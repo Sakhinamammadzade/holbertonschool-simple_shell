@@ -10,7 +10,7 @@ extern char **environ;
 void execute_command(char *command) {
     pid_t child_pid;
     int status;
-	int j;
+    int j;
     char *token;
     char **args;
     int i = 0;
@@ -41,11 +41,11 @@ void execute_command(char *command) {
 
         if (WIFEXITED(status)) {
             if (WEXITSTATUS(status) != 0) {
-                fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
+               // fprintf(stderr, "line 44: ./hsh: 1: %s: not found\n", args[0]);
                 exit(WEXITSTATUS(status));
             }
         } else if (WIFSIGNALED(status)) {
-            fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", args[0], WTERMSIG(status));
+            fprintf(stderr, "line 48: ./hsh: 1: %s: terminated by signal %d\n", args[0], WTERMSIG(status));
             exit(EXIT_FAILURE);
         }
     }
@@ -61,8 +61,6 @@ int main(void) {
     char *token;
     char **commands;
     int i;
-	int j;
-	int k;
 
     while (1) {
         if (getline(&buffer, &buffer_size, stdin) == -1)
@@ -85,23 +83,28 @@ int main(void) {
 
         commands[i] = NULL;
 
-        for (j = 0; j < i; j++) {
+        int exit_flag = 0;
+
+        for (int j = 0; j < i; j++) {
             if (strcmp(commands[j], "exit") == 0) {
-                free(buffer);
-                for (k = 0; k < i; k++)
-                    free(commands[k]);
-                free(commands);
-                exit(EXIT_SUCCESS);
+                exit_flag = 1;
+                break;
             } else {
                 execute_command(commands[j]);
             }
         }
 
-        for (j = 0; j < i; j++)
+        for (int j = 0; j < i; j++)
             free(commands[j]);
         free(commands);
+
+        if (exit_flag) {
+            free(buffer);
+            exit(EXIT_SUCCESS);
+        }
     }
 
     free(buffer);
     return 0;
 }
+
