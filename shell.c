@@ -92,6 +92,7 @@ int main(void)
         }
         for (j = 0; j < i; j++)
             free(memory[j]);
+		free(memory);
     }
     free(buffer);
     free(memory);
