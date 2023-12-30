@@ -15,14 +15,19 @@ int main(void)
     int is_piped_input;
 
     memory = malloc(sizeof(char *) * 1024);
+
     while (1)
     {
         if (getline(&buffer, &buffer_size, stdin) == -1)
             break;
+
         i = 0;
+
         token = strtok(buffer, " \t\n");
+
         if (token == NULL)
             continue;
+
         while (token != NULL)
         {
             memory[i] = malloc(strlen(token) + 1);
@@ -30,11 +35,14 @@ int main(void)
             token = strtok(NULL, " \t\n");
             i++;
         }
+
         memory[i] = NULL;
+
         if (i > 0 && strcmp(memory[0], "exit") == 0)
         {
             for (j = 0; j < i; j++)
                 free(memory[j]);
+
             free(buffer);
             free(memory);
             exit(EXIT_SUCCESS);
@@ -51,6 +59,7 @@ int main(void)
         else
         {
             is_piped_input = isatty(fileno(stdin)) == 0;
+
             child_pid = fork();
             if (child_pid == 0)
             {
@@ -59,16 +68,14 @@ int main(void)
                     if (execvp(memory[0], memory) == -1)
                     {
                         perror("ERROR execvp:");
-                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                         exit(EXIT_FAILURE);
                     }
                 }
                 else
                 {
-                    if (execvp(memory[0], memory) == -1)
+                    if (execlp("/bin/sh", "sh", "-c", buffer, (char *)NULL) == -1)
                     {
-                        perror("ERROR execvp:");
-                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        perror("ERROR execlp:");
                         exit(EXIT_FAILURE);
                     }
                 }
@@ -76,25 +83,15 @@ int main(void)
             else
             {
                 wait(&status);
-                if (WIFEXITED(status))
-                {
-                    if (WEXITSTATUS(status) != 0)
-                    {
-                        exit(WEXITSTATUS(status));
-                    }
-                }
-                else if (WIFSIGNALED(status))
-                {
-                    fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
-                    exit(EXIT_FAILURE);
-                }
             }
         }
+
         for (j = 0; j < i; j++)
             free(memory[j]);
-		free(memory);
     }
+
     free(buffer);
     free(memory);
+
     return 0;
 }
