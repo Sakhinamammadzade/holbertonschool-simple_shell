@@ -1,6 +1,7 @@
 #include "shell.h"
 
 extern char **environ;
+
 int main(void)
 {
     int status;
@@ -9,7 +10,7 @@ int main(void)
     char *token;
     int i = 0;
     char **memory;
-	pid_t child_pid;
+    pid_t child_pid;
     int j;
     int is_piped_input;
 
@@ -50,7 +51,7 @@ int main(void)
         else
         {
             is_piped_input = isatty(fileno(stdin)) == 0;
- 	    child_pid = fork();
+            child_pid = fork();
             if (child_pid == 0)
             {
                 if (is_piped_input)
@@ -58,35 +59,35 @@ int main(void)
                     if (execvp(memory[0], memory) == -1)
                     {
                         perror("ERROR execvp:");
-			fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
+                        fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                         exit(EXIT_FAILURE);
                     }
-                } else
+                }
+                else
                 {
                     if (execvp(memory[0], memory) == -1)
                     {
                         perror("ERROR execvp:");
                         fprintf(stderr, "./hsh: 1: %s: not found\n", memory[0]);
                         exit(EXIT_FAILURE);
-                       
                     }
                 }
             }
             else
             {
                 wait(&status);
-		 if (WIFEXITED(status))
-        	{
-            	if (WEXITSTATUS(status) != 0)
-            	{
-					exit(WEXITSTATUS(status));
-            	}
-        	}
-        	else if (WIFSIGNALED(status))
-        	{
-            fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
-            exit(EXIT_FAILURE);
-        }
+                if (WIFEXITED(status))
+                {
+                    if (WEXITSTATUS(status) != 0)
+                    {
+                        exit(WEXITSTATUS(status));
+                    }
+                }
+                else if (WIFSIGNALED(status))
+                {
+                    fprintf(stderr, "./hsh: 1: %s: terminated by signal %d\n", memory[0], WTERMSIG(status));
+                    exit(EXIT_FAILURE);
+                }
             }
         }
         for (j = 0; j < i; j++)
