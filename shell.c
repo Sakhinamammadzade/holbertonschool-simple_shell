@@ -41,8 +41,7 @@ void execute_command(char *command) {
 
         if (WIFEXITED(status)) {
             if (WEXITSTATUS(status) != 0) {
-               // fprintf(stderr, "line 44: ./hsh: 1: %s: not found\n", args[0]);
-                exit(WEXITSTATUS(status));
+				exit(WEXITSTATUS(status));
             }
         } else if (WIFSIGNALED(status)) {
             fprintf(stderr, "line 48: ./hsh: 1: %s: terminated by signal %d\n", args[0], WTERMSIG(status));
@@ -61,6 +60,8 @@ int main(void) {
     char *token;
     char **commands;
     int i;
+	int exit_flag;
+	int j;
 
     while (1) {
         if (getline(&buffer, &buffer_size, stdin) == -1)
@@ -83,9 +84,9 @@ int main(void) {
 
         commands[i] = NULL;
 
-        int exit_flag = 0;
+        exit_flag = 0;
 
-        for (int j = 0; j < i; j++) {
+        for (j = 0; j < i; j++) {
             if (strcmp(commands[j], "exit") == 0) {
                 exit_flag = 1;
                 break;
@@ -94,7 +95,7 @@ int main(void) {
             }
         }
 
-        for (int j = 0; j < i; j++)
+        for (j = 0; j < i; j++)
             free(commands[j]);
         free(commands);
 
@@ -107,4 +108,3 @@ int main(void) {
     free(buffer);
     return 0;
 }
-
